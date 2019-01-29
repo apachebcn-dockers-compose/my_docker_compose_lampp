@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+  webserver:
+    build: ./bin/webserver
+    container_name: 'php-webserver'
+    hostname: php-webserver
+    restart: 'always'
+    ports:
+      - "80:80"
+      - "443:443"
+    links: 
+      - mysql
+    volumes: 
+      - ./www:/var/www/html
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/vhosts/enable:/etc/apache2/sites-enabled
+      - ./config/vhosts/available:/etc/apache2/sites-available
+      - ./logs/apache2:/var/log/apache2
+      #- ./var-run:/var/run
+    environment:
+      # /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      PHP_EXTENSION_XDEBUG: 1
+      PHP_IDE_CONFIG: "serverName=Test"
+      XDEBUG_CONFIG: "remote_host=192.168.43.187"
+  mysql:
+    build: ./bin/mysql
+    container_name: 'php-mysql'
+    restart: 'always'
+    ports:
+      - "3306:3306"
+    volumes: 
+      - ./data/mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+      #- ./var-run:/var/run
+    environment:
+      MYSQL_ROOT_PASSWORD: apachebcn2
+      MYSQL_DATABASE: test
+      MYSQL_USER: apachebcn
+      MYSQL_PASSWORD: apachebcn2
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+#    image: bitnami/phpmyadmin:latest
+    container_name: 'php-phpmyadmin'
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - '8080:80'
+    volumes: 
+      - /sessions
+      #- ./var-run:/var/run
+
