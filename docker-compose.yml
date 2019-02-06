@@ -1,14 +1,17 @@
 version: "3"
 
 services:
-  webserver:
+  prestashop16:
+#    networks:
+#      default:
+#         ipv4_address: 192.168.10.2
     build: ./bin/webserver
-    container_name: 'php-webserver'
-    hostname: php-webserver
+    container_name: 'php-prestashop16'
+    hostname: php-prestashop16
     restart: 'always'
     ports:
-      - "80:80"
-      - "443:443"
+      - "81:80"
+      - "444:443"
     links: 
       - mysql
     volumes: 
@@ -17,13 +20,19 @@ services:
       - ./config/vhosts/enable:/etc/apache2/sites-enabled
       - ./config/vhosts/available:/etc/apache2/sites-available
       - ./logs/apache2:/var/log/apache2
-      #- ./var-run:/var/run
     environment:
       # /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       PHP_EXTENSION_XDEBUG: 1
       PHP_IDE_CONFIG: "serverName=Test"
       XDEBUG_CONFIG: "remote_host=192.168.43.187"
+    extra_hosts:
+      - "somehost:162.242.195.82"
+      - "otherhost:50.31.209.229"
+
   mysql:
+#    networks:
+#      default:
+#         ipv4_address: 192.168.10.3
     build: ./bin/mysql
     container_name: 'php-mysql'
     restart: 'always'
@@ -32,13 +41,16 @@ services:
     volumes: 
       - ./data/mysql:/var/lib/mysql
       - ./logs/mysql:/var/log/mysql
-      #- ./var-run:/var/run
     environment:
-      MYSQL_ROOT_PASSWORD: apachebcn2
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: test
-      MYSQL_USER: apachebcn
-      MYSQL_PASSWORD: apachebcn2
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+
   phpmyadmin:
+#    networks:
+#      default:
+#         ipv4_address: 192.168.10.4
     image: phpmyadmin/phpmyadmin
 #    image: bitnami/phpmyadmin:latest
     container_name: 'php-phpmyadmin'
@@ -50,6 +62,11 @@ services:
     ports:
       - '8080:80'
     volumes: 
-      - /sessions
-      #- ./var-run:/var/run
+      - ./data/phpmyadmin/session:/sessions
 
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/24

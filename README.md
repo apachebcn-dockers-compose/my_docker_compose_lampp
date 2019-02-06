@@ -1,5 +1,12 @@
 # LAMP stack built with Docker Compose
 
+MODIFICADO POR APACHEBCN, para agregar.
+- Instalación de midnight-commander, net-tools, wget
+- Adición de hosts en el servidor web
+- Subred dinámica (para poder comunicar con otro contenedores)
+- Scripts para acceder vía bash a los contenedores
+- Scripts para inspeccionar los detalles de cada contenedor en ejecución
+
 ![Landing Page](https://preview.ibb.co/gOTa0y/LAMP_STACK.png)
 
 This is a basic LAMP stack environment built using Docker Compose. It consists following:
